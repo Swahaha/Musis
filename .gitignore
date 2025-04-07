@@ -5,7 +5,7 @@ node_modules
 .DS_Store
 
 # data oops
-data/
+pipeline/data/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
