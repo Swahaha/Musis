@@ -1,0 +1,35 @@
+.
+├── Makefile
+├── README.md
+├── data
+│   ├── processed
+│   └── raw
+│       ├── CVC-MUSCIMA
+│       ├── CVCMUSCIMA_SR.zip
+│       ├── DeepScoresV2_dense
+│       ├── PrIMuS
+│       ├── dataset_structure.txt
+│       ├── ds2_dense.tar.gz
+│       └── primusCalvoRizoAppliedSciences2018.tgz
+├── dataset_structure.txt
+├── requirements.txt
+├── setup.py
+├── src
+│   ├── musis
+│   │   ├── __init__.py
+│   │   ├── __pycache__
+│   │   ├── config.yaml
+│   │   ├── data
+│   │   ├── export_musicxml.py
+│   │   ├── models
+│   │   ├── musis.egg-info
+│   │   └── train.py
+│   └── musis.egg-info
+│       ├── PKG-INFO
+│       ├── SOURCES.txt
+│       ├── dependency_links.txt
+│       └── top_level.txt
+└── tests
+    └── test_visualize_cvc.py
+
+15 directories, 18 files
