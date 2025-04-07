@@ -1,6 +1,13 @@
-# sunday
+# Musis - Optical Music Recognition Interface
 
-PRIMUS - https://grfia.dlsi.ua.es/primus/packages/primusCalvoRizoAppliedSciences2018.tgz
-DeepScores - https://zenodo.org/records/4012193/files/ds2_dense.tar.gz?download=1
-CVC-MUSCIMA - http://datasets.cvc.uab.es/muscima/CVCMUSCIMA_SR.zip
+As someone who enjoys music production, I wanted a quick and easy way to convert sheet music into editable formats like MusicXML or MIDI — something I could plug into my DAW and mess around with. 
 
+But I couldn’t find a free and reliable solution out there.
+
+Musis is built to fix that.
+
+It’s an open-source tool that makes it easy to upload scanned sheet music and get structured, editable output.
+
+Stay tuned :)
+
+Built by @Swahaha and @anirudhjain26
