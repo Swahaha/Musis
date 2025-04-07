@@ -1,111 +1,112 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
-import { dummyMusicXML } from '../lib/musicxml';
+import { xmlContent } from '../app/page';
 
 interface ScoreViewerProps {
   onNoteClick: (xml: string) => void;
 }
 
-export default function ScoreViewer({ onNoteClick }: ScoreViewerProps) {
+interface GraphicalMeasure {
+  graphicalElements?: Array<{
+    sourceNote?: {
+      toXMLString: () => string;
+    };
+    svgElement?: HTMLElement;
+  }>;
+}
+
+const ScoreRenderer = ({ containerId, onNoteClick }: { containerId: string; onNoteClick: (xml: string) => void }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [osmdInstance, setOsmdInstance] = useState<any>(null);
+  const osmdRef = useRef<any>(null);
 
   useEffect(() => {
     const loadOSMD = async () => {
+      if (!containerRef.current) return;
+
       try {
-        const osmd = await import('opensheetmusicdisplay');
-        if (containerRef.current) {
-          const instance = new osmd.OpenSheetMusicDisplay(containerRef.current, {
-            autoResize: true,
-            drawTitle: true,
-            backend: 'svg',
-          });
-          
-          console.log('Loading MusicXML:', dummyMusicXML);
-          await instance.load(dummyMusicXML);
-          console.log('MusicXML loaded, rendering...');
-          await instance.render();
-          console.log('Rendering complete');
-          setOsmdInstance(instance);
+        const osmdModule = await import('opensheetmusicdisplay');
+        const instance = new osmdModule.OpenSheetMusicDisplay(containerRef.current, {
+          autoResize: false,
+          drawTitle: true,
+          backend: 'svg',
+          drawComposer: false,
+          drawSubtitle: false,
+          drawLyricist: false,
+          drawCredits: false,
+          pageFormat: 'A4',
+          renderSingleHorizontalStaffline: true,
+          newSystemFromXML: false,
+          newPageFromXML: false
+        });
 
-          // Wait for the next frame to ensure rendering is complete
-          setTimeout(() => {
-            try {
-              console.log('OSMD instance:', instance);
-              
-              // Get all measures
-              const measures = instance.GraphicSheet.MeasureList;
-              console.log('Number of measures found:', measures?.length);
+        // Set additional rendering options
+        instance.EngravingRules.RenderMultipleRestMeasures = false;
 
-              if (measures && measures.length > 0) {
-                measures.forEach((measure: any, measureIndex: number) => {
-                  console.log(`Processing measure ${measureIndex}`);
-                  
-                  // Get all graphical elements in the measure
-                  const graphicalElements = measure.graphicalElements;
-                  console.log(`Measure ${measureIndex} graphical elements:`, graphicalElements?.length);
+        osmdRef.current = instance;
 
-                  if (graphicalElements && graphicalElements.length > 0) {
-                    graphicalElements.forEach((element: any) => {
-                      // Check if this is a note
-                      if (element.sourceNote) {
-                        console.log('Found note:', element.sourceNote);
-                        
-                        // Get the SVG element for this note
-                        const svgElement = element.svgElement;
-                        if (svgElement) {
-                          // Clone the element to remove any existing listeners
-                          const newSvgElement = svgElement.cloneNode(true);
-                          svgElement.parentNode?.replaceChild(newSvgElement, svgElement);
-                          
-                          // Add pointer cursor to make it clear it's clickable
-                          (newSvgElement as HTMLElement).style.cursor = 'pointer';
+        await instance.load(xmlContent);
+        await instance.render();
 
-                          // Add click event listener
-                          newSvgElement.addEventListener('click', (e: MouseEvent) => {
-                            e.stopPropagation();
-                            console.log('Note clicked!', element.sourceNote);
-                            
-                            const note = element.sourceNote;
-                            const mockNoteXML = `<note>
-  <pitch>
-    <step>${note.pitch.step}</step>
-    <octave>${note.pitch.octave}</octave>
-  </pitch>
-  <duration>${note.length.value}</duration>
-  <type>${note.length.type}</type>
-</note>`;
-                            console.log('Sending note XML:', mockNoteXML);
-                            onNoteClick(mockNoteXML);
-                          });
-                        }
+        const measures = (instance.GraphicSheet.MeasureList as unknown) as GraphicalMeasure[];
+        if (measures && Array.isArray(measures)) {
+          measures.forEach(measure => {
+            if (measure.graphicalElements && Array.isArray(measure.graphicalElements)) {
+              measure.graphicalElements.forEach(element => {
+                if (element.sourceNote) {
+                  const svgElement = element.svgElement;
+                  if (svgElement) {
+                    svgElement.style.cursor = 'pointer';
+                    svgElement.addEventListener('click', () => {
+                      const noteXml = element.sourceNote?.toXMLString();
+                      if (noteXml) {
+                        onNoteClick(noteXml);
                       }
                     });
                   }
-                });
-              }
-            } catch (error) {
-              console.error('Error accessing notes:', error);
+                }
+              });
             }
-          }, 100);
+          });
         }
       } catch (error) {
-        console.error('Error loading OSMD:', error);
+        console.error('Error loading score:', error);
       }
     };
 
     loadOSMD();
 
-    // Cleanup
     return () => {
-      if (osmdInstance) {
-        osmdInstance.clear();
+      if (osmdRef.current) {
+        osmdRef.current.clear();
+        osmdRef.current = null;
       }
     };
-  }, [onNoteClick]);
+  }, [containerId, onNoteClick]);
 
   return (
-    <div className="w-full h-full p-4">
-      <div ref={containerRef} className="w-full h-full" />
+    <div 
+      id={containerId}
+      ref={containerRef}
+      style={{ 
+        width: '595px',
+        height: '842px',
+        transform: 'scale(0.7)',
+        transformOrigin: 'top center'
+      }}
+    />
+  );
+};
+
+export default function ScoreViewer({ onNoteClick }: ScoreViewerProps) {
+  return (
+    <div className="w-full h-full flex justify-center items-center">
+      <div 
+        className="overflow-auto"
+        style={{ backgroundColor: 'white' }}
+      >
+        <ScoreRenderer key="single-score" containerId="score-container" onNoteClick={onNoteClick} />
+      </div>
     </div>
   );
 } 
