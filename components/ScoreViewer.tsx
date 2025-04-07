@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { xmlContent } from '../app/page';
+import { xmlContent } from '../app/constants/xmlContent';
 
 interface ScoreViewerProps {
   onNoteClick: (xml: string) => void;
