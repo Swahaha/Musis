@@ -1,3 +1,30 @@
 node_modules
 .env.local
 .next/
+
+.DS_Store
+
+# data oops
+data/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments
+venv/
+.env/
+
+# Test and coverage
+.pytest_cache/
+
+# Build
+build/
+dist/
+
+# VSCode settings (optional)
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
