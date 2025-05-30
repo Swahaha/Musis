@@ -9,5 +9,3 @@ Musis is built to fix that.
 It’s an open-source tool that makes it easy to upload scanned sheet music and get structured, editable output.
 
 Stay tuned :)
-
-Built by @Swahaha and @anirudhjain26
